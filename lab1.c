@@ -9,6 +9,7 @@ touch file1.txt
 ls
 git status
 git add file1.txt
+git show
 git commit-m "file created"
 vi file2.txt
 git add
