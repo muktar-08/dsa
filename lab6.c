@@ -1,89 +1,49 @@
-#include <stdio.h>
-#define MAX 5
-
-char queue[MAX];
-int front = -1, rear = -1;
-
-int isEmpty() {
-    return front == -1;
+#include<stdio.h>
+int n,m,p[10],w[10];
+int max(int a, int b)
+{
+return(a>b?a:b);
 }
-
-int isFull() {
-    return (rear + 1) % MAX == front;
+void knapsack_DP()
+{
+int V[10][10],i,j;
+for(i=0;i<=n;i++)
+for(j=0;j<=m;j++)
+if(i==0 || j==0)
+V[i][j]=0;
+else if(j<w[i])
+V[i][j]=V[i-1][j];
+else
+V[i][j]=max(V[i-1][j],p[i]+V[i-1][j-w[i]]);
+for(i=0;i<=n;i++)
+{
+for(j=0;j<=m;j++)
+printf("%d ",V[i][j]);
+printf("\n");
 }
-
-void insert() {
-    char element;
-    if (isFull()) {
-        printf("Queue Overflow! Cannot insert more elements.\n");
-        return;
-    }
-    printf("Enter the element to insert: ");
-    scanf(" %c", &element);
-    if (isEmpty()) {
-        front = rear = 0;
-    } else {
-        rear = (rear + 1) % MAX;
-    }
-    queue[rear] = element;
-    printf("Inserted '%c' into the queue.\n", element);
+printf("Items included are:");
+while(n > 0)
+{
+if(V[n][m] != V[n-1][m])
+{
+printf("%d ",n);
+m = m - w[n];
 }
-
-void delete() {
-    if (isEmpty()) {
-        printf("Queue Underflow! No elements to delete.\n");
-        return;
-    }
-    printf("Deleted '%c' from the queue.\n", queue[front]);
-    if (front == rear) {
-        front = rear = -1;
-    } else {
-        front = (front + 1) % MAX;
-    }
+n--;
 }
-
-void display() {
-    if (isEmpty()) {
-        printf("Queue is empty.\n");
-        return;
-    }
-    printf("Queue contents: ");
-    int i = front;
-    do {
-        printf("%c ", queue[i]);
-        i = (i + 1) % MAX;
-    } while (i != (rear + 1) % MAX);
-    printf("\n");
 }
-
-int main() {
-    int choice;
-    do {
-        printf("\n--- Circular Queue Menu ---\n");
-        printf("1. Insert an Element\n");
-        printf("2. Delete an Element\n");
-        printf("3. Display Queue\n");
-        printf("4. Exit\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
-
-        switch (choice) {
-        case 1:
-            insert();
-            break;
-        case 2:
-            delete();
-            break;
-        case 3:
-            display();
-            break;
-        case 4:
-            printf("Exiting program...\n");
-            break;
-        default:
-            printf("Invalid choice! Please try again.\n");
-        }
-    } while (choice != 4);
-
-    return 0;
+int main()
+{
+int i;
+printf("Enter the no. of items: ");
+scanf("%d",&n);
+printf("Enter the weights of n items: ");
+for(i=1;i<=n;i++)
+scanf("%d",&w[i]);
+printf("Enter the prices of n items: ");
+for(i=1;i<=n;i++)
+  scanf("%d",&p[i]);
+printf("Enter the capacity of Knapsack: ");
+scanf("%d",&m);
+knapsack_DP();
 }
