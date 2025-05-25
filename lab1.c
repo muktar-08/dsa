@@ -1,83 +1,47 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#define NUM_DAYS_IN_WEEK 7
-typedef struct
+#include<stdio.h>
+int cost[10][10],n;
+void kruskal()
 {
-char *acDayName;
-int iDate;
-char *acActivity;
-} DAYTYPE;
-void fnFreeCal (DAYTYPE *);
-void fnDispCal (DAYTYPE *);
-void fnReadCal (DAYTYPE *);
-DAYTYPE *fnCreateCal();
-int main()
+int par[n];
+int a=0,b=0,u=0,v=0,min, mincost = 0, ne = 0;
+for(int i=0;i<n;i++)
+par[i]=-1;
+printf("the minimum spanning tree edges are...");
+while(ne < n-1)
 {
-DAYTYPE *weeklyCalendar = fnCreateCal();
-fnReadCal (weeklyCalendar);
-fnDispCal (weeklyCalendar);
-fnFreeCal (weeklyCalendar);
-return 0;
+
+min = 999;
+for(int i=0;i<n;i++)
+for(int j=0;j<n;j++)
+if(cost[i][j] < min)
+{
+min=cost[i][j];
+a=u=i;
+b=v=j;
 }
-DAYTYPE *fnCreateCal ()
+while(par[u]!=-1)
+u=par[u];
+while(par[v]!=-1)
+v=par[v];
+if(u!=v)
 {
-DAYTYPE *calendar = (DAYTYPE *)malloc( NUM_DAYS_IN_WEEK *sizeof(DAYTYPE));
-for (int i = 0; i < NUM_DAYS_IN_WEEK; i++)
-{
-calendar[i].acDayName = NULL;
-calendar[i].iDate = 0;
-calendar[i].acActivity = NULL;
+printf("From vertex %d to vertex %d and the cost = %d\n",a,b,min);
+mincost+=min;
+par[v]=u;
+ne++;
 }
-return calendar;
+
+cost[a][b]=cost[b][a]=999;
 }
-void fnReadCal (DAYTYPE *calendar)
-{
-char cChoice;
-for (int i = 0; i < NUM_DAYS_IN_WEEK; i++)
-{
-printf("Do you want to enter details for day %d [Y/N]: ", i + 1);
-scanf("%c", &cChoice);
-getchar();
-if (tolower(cChoice) == 'n')
-continue;
-printf("Day Name: ");
-char nameBuffer[50];
-scanf("%s", &nameBuffer);
-calendar[i].acDayName = strdup (nameBuffer);
-printf("Date: ");
-scanf("%d", &calendar[i].iDate);
-printf("Activity: ");
-char activityBuffer[100];
-scanf("%S", &activityBuffer); 
-calendar[i].acActivity = strdup (activityBuffer);
-printf("\n");
-getchar(); 
+printf("Cost of MST = %d", mincost);
 }
-}
-void fnDispCal (DAYTYPE *calendar)
+void main()
 {
-printf("\nWeek's Activity Details:\n");
-for (int i = 0; i < NUM_DAYS_IN_WEEK; i++)
-{
-printf("Day %d:\n", i + 1);
-if (calendar[i].iDate == 0)
-{
-printf("No Activity\n\n");
-continue;
-}
-printf(" Day Name: %s\n", calendar[i].acDayName);
-printf(" Date: %d\n", calendar [i].iDate);
-printf(" Activity: %s\n\n", calendar[i].acActivity);
-}
-}
-void fnFreeCal (DAYTYPE *calendar)
-{
-for(int i = 0; i < NUM_DAYS_IN_WEEK; i++)
-{
-free (calendar[i].acDayName);
-free (calendar[i].acActivity);
-}
-free(calendar);
+printf("Enter the no. of vertices:");
+scanf("%d",&n);
+printf("Enter the cost matrix\n");
+for(int i=0;i<n;i++)
+for(int j=0;j<n;j++)
+scanf("%d",&cost[i][j]);
+kruskal();
 }
