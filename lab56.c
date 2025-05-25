@@ -1,82 +1,39 @@
-#include <stdio.h>
-#include <string.h>
-#define MAX 5
-
-int stack[MAX], top = -1;
-
-int isFull() {
-    return top == MAX - 1;
+#include<stdio.h>
+int cost[10][10],n,colsum[10];
+void cal_colsum()
+{
+for(int j=0;j<n;j++)
+{
+colsum[j]=0;
+for(int i=0;i<n;i++)
+colsum[j]+=cost[i][j];
 }
-
-int isEmpty() {
-    return top == -1;
 }
-
-void push() {
-    if (isFull()) {
-        printf("Stack Overflow!\n");
-        return;
-    }
-    int element;
-    printf("Enter element to push: ");
-    scanf("%d", &element);
-    stack[++top] = element;
-    printf("%d pushed onto the stack.\n", element);
+void source_removal()
+{
+int i,j,k,select[10]={0};
+printf("Topological ordering is:");
+for(i=0;i<n;i++)
+{
+cal_colsum();
+for(j=0;j<n;j++)
+{
+if(select[j]==0 && colsum[j]==0)/
+break;
 }
-
-void pop() {
-    if (isEmpty()) {
-        printf("Stack Underflow!\n");
-        return;
-    }
-    printf("%d popped from the stack.\n", stack[top--]);
+printf("%d ",j);
+select[j]=1;
+for(k=0;k<n;k++)
+cost[j][k]=0;
 }
-
-void checkPalindrome() {
-    if (isEmpty()) {
-        printf("Stack is empty, cannot check palindrome.\n");
-        return;
-    }
-    int i, isPalin = 1;
-    for (i = 0; i <= top / 2; i++) {
-        if (stack[i] != stack[top - i]) {
-            isPalin = 0;
-            break;
-        }
-    }
-    if (isPalin)
-        printf("The stack contents form a palindrome.\n");
-    else
-        printf("The stack contents do not form a palindrome.\n");
 }
-
-void display() {
-    if (isEmpty()) {
-        printf("Stack is empty.\n");
-        return;
-    }
-    printf("Stack contents: ");
-    for (int i = 0; i <= top; i++)
-        printf("%d ", stack[i]);
-    printf("\n");
-}
-
-int main() {
-    int choice;
-    do {
-        printf("\n--- Stack Menu ---\n");
-        printf("1. Push\n2. Pop\n3. Check Palindrome\n4. Display\n5. Exit\nEnter your choice: ");
-        scanf("%d", &choice);
-
-        switch (choice) {
-        case 1: push(); break;
-        case 2: pop(); break;
-        case 3: checkPalindrome(); break;
-        case 4: display(); break;
-        case 5: printf("Exiting...\n"); break;
-        default: printf("Invalid choice!\n");
-        }
-    } while (choice != 5);
-
-    return 0;
+void main()
+{
+printf("Enter no. of Vertices: ");
+scanf("%d",&n);
+printf("Enter the cost matrix\n");
+for(int i=0;i<n;i++)
+for(int j=0;j<n;j++)
+scanf("%d",&cost[i][j]);
+source_removal();
 }
