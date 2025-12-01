@@ -1,49 +1,79 @@
-#include<stdio.h>
-int n,m,p[10],w[10];
-int max(int a, int b)
+import java.util.*;
+public class Belmanford
 {
-return(a>b?a:b);
+private int D[];
+private int n;
+public static final int max_value=999;
+public Belmanford(int n)
+{
+this.n=n;
+D=new int[n+1];
 }
-void knapsack_DP()
+public void shortest(int s,int a[][])
 {
-int V[10][10],i,j;
-for(i=0;i<=n;i++)
-for(j=0;j<=m;j++)
-if(i==0 || j==0)
-V[i][j]=0;
-else if(j<w[i])
-V[i][j]=V[i-1][j];
-else
-V[i][j]=max(V[i-1][j],p[i]+V[i-1][j-w[i]]);
-for(i=0;i<=n;i++)
+for(int i=1;i<=n;i++)
 {
-for(j=0;j<=m;j++)
-printf("%d ",V[i][j]);
-printf("\n");
+D[i]=max_value;
 }
-printf("Items included are:");
-while(n > 0)
+D[s]=0;
+for(int k=1;k<=n-1;k++)
 {
-if(V[n][m] != V[n-1][m])
+for(int i=1;i<=n;i++)
 {
-printf("%d ",n);
-m = m - w[n];
-}
-n--;
+for(int j=1;j<=n;j++)
+{
+if(a[i][j]!=max_value)
+{
+if(D[j]>D[i]+a[i][j])
+D[j]=D[i]+a[i][j];
 }
 }
-int main()
+}
+} for (
+int i=1;i<=n;i++)
 {
-int i;
-printf("Enter the no. of items: ");
-scanf("%d",&n);
-printf("Enter the weights of n items: ");
-for(i=1;i<=n;i++)
-scanf("%d",&w[i]);
-printf("Enter the prices of n items: ");
-for(i=1;i<=n;i++)
-  scanf("%d",&p[i]);
-printf("Enter the capacity of Knapsack: ");
-scanf("%d",&m);
-knapsack_DP();
+for (int j=1;j<=n;j++)
+{
+if(a[i][j]!=max_value)
+{
+if(D[j]>D[i]+a[i][j])
+{
+System.out.println("the graph contains -ve edge cycle");
+return;
+}
+}
+}
+} for (
+int i=1;i<=n;i++)
+{
+System.out.println("distance of source"+s+"to"+i+"is"+D[i]);
+}
+}
+public static void main(String[] args)
+{
+int n=0,s;
+Scanner sc=new Scanner(System.in);
+System.out.println("enter the no.of values");
+n=sc.nextInt();
+int a[][]=new int [n+1][n+1];
+System.out.println("enter the weighted matrix:");
+for (int i=1;i<=n;i++)
+{
+for (int j=1;j<=n;j++)
+{
+a[i][j]=sc.nextInt();
+if(i==j)
+{
+a[i][j]=0;
+continue;
+} if(a[i][j]==0)
+a[i][j]=max_value;
+}
+}
+System.out.println("enter the source vertex:");
+s=sc.nextInt();
+Belmanford b=new Belmanford(n);
+b.shortest(s,a);
+sc.close();
+}
 }
