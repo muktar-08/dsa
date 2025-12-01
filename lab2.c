@@ -1,39 +1,57 @@
-#include<stdio.h>
-int cost[10][10],n;
-void prim()
-{
-int vt[10]={0};
-int a=0,b=0,min, mincost = 0, ne = 0;
-vt[0] = 1;
-while(ne < n-1)
-{
-min = 999;
-for (int i = 0; i<n; i++)
-{
-if(vt[i]==1)
-for(int j = 0;j <n; j++)
-if(cost[i][j] < min && vt[j]==0)
-{
-min = cost[i][j];
-a = i;
-b = j;
-}
-}
-printf("Edge from vertex %d to vertex %d and the cost %d\n",a,b,min);
-vt[b] = 1;
-ne++;
-mincost += min;
-cost[a][b] = cost[b][a] = 999;
-}
-printf("minimum spanning tree cost is %d",mincost);
-}
-void main()
-{
-printf("Enter the no. of vertices: ");
-scanf("%d",&n);
-printf("Enter the cost matrix\n");
-for(int i=0;i<n;i++)
-for(int j=0;j<n;j++)
-scanf("%d",&cost[i][j]);
-prim();
-}
+set ns [new Simulator]
+set nf [open lab2.nam w]
+$ns namtrace-all $nf
+set nd [open lab2.tr w]
+$ns trace-all $nd
+proc finish {}
+{ global ns nf nd
+$ns flush-trace
+close $nf
+close $nd
+exec nam lab2.nam &
+exit 0
+}s
+et n0 [$ns node]
+set n1 [$ns node]
+set n2 [$ns node]
+set n3 [$ns node]
+set n4 [$ns node]
+set n5 [$ns node]
+set n6 [$ns node]
+$ns duplex-link $n1 $n0 1Mb 10ms DropTail
+$ns duplex-link $n2 $n0 1Mb 10ms DropTail
+$ns duplex-link $n3 $n0 1Mb 10ms DropTail
+$ns duplex-link $n4 $n0 1Mb 10ms DropTail
+$ns duplex-link $n5 $n0 1Mb 10ms DropTail
+$ns duplex-link $n6 $n0 1Mb 10ms DropTail
+Agent/Ping instproc recv {from rtt} {
+$self instvar node_
+puts "node [$node_ id] recieved ping answer from \
+$from with round-trip-time $rtt ms."
+}s
+et p1 [new Agent/Ping]
+set p2 [new Agent/Ping]
+set p3 [new Agent/Ping]
+set p4 [new Agent/Ping]
+set p5 [new Agent/Ping]
+set p6 [new Agent/Ping]
+$ns attach-agent $n1 $p1
+$ns attach-agent $n2 $p2
+$ns attach-agent $n3 $p3
+$ns attach-agent $n4 $p4
+$ns attach-agent $n5 $p5
+$ns attach-agent $n6 $p6
+$ns queue-limit $n0 $n4 3
+$ns queue-limit $n0 $n5 2
+$ns queue-limit $n0 $n6 2
+$ns connect $p1 $p4
+$ns connect $p2 $p5
+$ns connect $p3 $p6
+$ns at 0.2 "$p1 send"
+$ns at 0.4 "$p2 send"
+$ns at 0.6 "$p3 send"
+$ns at 1.0 "$p4 send"
+$ns at 1.2 "$p5 send"
+$ns at 1.4 "$p6 send"
+$ns at 2.0 "finish"
+$ns run
