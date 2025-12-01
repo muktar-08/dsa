@@ -1,47 +1,57 @@
-#include<stdio.h>
-int cost[10][10],n;
-void kruskal()
-{
-int par[n];
-int a=0,b=0,u=0,v=0,min, mincost = 0, ne = 0;
-for(int i=0;i<n;i++)
-par[i]=-1;
-printf("the minimum spanning tree edges are...");
-while(ne < n-1)
-{
-
-min = 999;
-for(int i=0;i<n;i++)
-for(int j=0;j<n;j++)
-if(cost[i][j] < min)
-{
-min=cost[i][j];
-a=u=i;
-b=v=j;
+set ns [ new Simulator ]
+set tf [ open lab1.tr w ]
+$ns trace-all $tf
+set nf [ open lab1.nam w ]
+$ns namtrace-all $nf
+# The below code is used to create the nodes.
+set n0 [$ns node]
+set n1 [$ns node]
+set n2 [$ns node]
+set n3 [$ns node]
+#This is used to give color to the packets.
+$ns color 1 "red"
+$ns color 2 "blue"
+$n0 label "Source/udp0"
+$n1 label "Source/udp1"
+$n2 label "Router"
+$n3 label "Destination/Null"
+#Vary the below Bandwidth and see the number of packets dropped.
+$ns duplex-link $n0 $n2 10Mb 300ms DropTail
+$ns duplex-link $n1 $n2 10Mb 300ms DropTail
+$ns duplex-link $n2 $n3 1Mb 300ms DropTail
+#The below code is used to set the queue size b/w the nodes
+$ns set queue-limit $n0 $n2 10
+$ns set queue-limit $n1 $n2 10
+$ns set queue-limit $n2 $n3 5
+#The below code is used to attach an UDP agent to n0, UDP agent to n1 and null agent ton3.
+set udp0 [new Agent/UDP]
+$ns attach-agent $n0 $udp0
+set cbr0 [new Application/Traffic/CBR]
+$cbr0 attach-agent $udp0 set null [new Agent/Null]
+$ns attach-agent $n3 $null set udp1 [new Agent/UDP]
+$ns attach-agent $n1 $udp1
+set cbr1 [new Application/Traffic/CBR]
+$cbr1 attach-agent $udp1
+#The below code sets the udp0 packets to red and udp1 packets to blue color
+$udp0 set class_ 1
+$udp1 set class_ 2
+#The below code is used to connect the agents.
+$ns connect $udp0 $null
+$ns connect $udp1 $null
+#The below code is used to set the packet size to 500
+$cbr1 set packetSize_ 500Mb
+#The below code is used to set the interval of the packets, i.e., Data rate of the packets.
+#if the data rate is high then packets drops are high.
+$cbr1 set interval_ 0.005
+proc finish { } {
+global ns nf tf
+$ns flush-trace
+exec nam lab1.nam &
+close $tf
+close $nf
+exit 0
 }
-while(par[u]!=-1)
-u=par[u];
-while(par[v]!=-1)
-v=par[v];
-if(u!=v)
-{
-printf("From vertex %d to vertex %d and the cost = %d\n",a,b,min);
-mincost+=min;
-par[v]=u;
-ne++;
-}
-
-cost[a][b]=cost[b][a]=999;
-}
-printf("Cost of MST = %d", mincost);
-}
-void main()
-{
-printf("Enter the no. of vertices:");
-scanf("%d",&n);
-printf("Enter the cost matrix\n");
-for(int i=0;i<n;i++)
-for(int j=0;j<n;j++)
-scanf("%d",&cost[i][j]);
-kruskal();
-}
+$ns at 0.1 "$cbr0 start"
+$ns at 0.1 "$cbr1 start"
+$ns at 10.0 "finish"
+$ns run
